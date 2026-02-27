@@ -14,6 +14,13 @@ const titleInput = document.getElementById('titleInput')
 const addButton = document.getElementById('addButton')
 const itemList = document.getElementById('itemList')
 const emptyMessage = document.getElementById('emptyMessage')
+const deleteButton = document.getElementById('deleteButton')
+const deleteSection = document.getElementById('deleteSection')
+
+// =====================================================
+// 選択状態の管理
+// =====================================================
+const selectedItems = new Set() // 選択中のアイテムIDを格納
 
 // ページ読み込み時にログ出力
 console.log('[CLIENT] ページが読み込まれました')
@@ -128,6 +135,52 @@ async function updateItem(id, newTitle) {
   }
 }
 
+/**
+ * 選択したアイテムを削除
+ *
+ * IPO:
+ * - Input: selectedItems セット（選択中のアイテムID）
+ * - Process: 各ID毎にサーバーへDELETEリクエストを送信
+ * - Output: 削除完了後に一覧を再読み込み
+ */
+async function deleteSelectedItems() {
+  if (selectedItems.size === 0) {
+    alert('削除するアイテムを選択してください')
+    return
+  }
+
+  const confirmMessage = `${selectedItems.size}個のアイテムを削除しますか？`
+  if (!confirm(confirmMessage)) {
+    return
+  }
+
+  console.log('[CLIENT] アイテムを削除:', Array.from(selectedItems))
+
+  try {
+    // 各アイテムをDELETE
+    for (const id of selectedItems) {
+      const response = await fetch(`/api/items/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(`ID ${id}: ${error.error}`)
+      }
+    }
+
+    // 削除完了後に選択をクリア
+    selectedItems.clear()
+
+    // 一覧を再読み込み
+    await loadItems()
+    console.log('[CLIENT] 削除完了')
+  } catch (error) {
+    console.error('[CLIENT] エラー:', error)
+    alert('削除に失敗しました: ' + error.message)
+  }
+}
+
 
 // =====================================================
 // 画面描画関数
@@ -143,10 +196,33 @@ function renderItems(items) {
   // 空メッセージの表示/非表示
   emptyMessage.style.display = items.length === 0 ? 'block' : 'none'
 
+  // 削除ボタンセクションの表示/非表示
+  if (deleteSection) {
+    deleteSection.style.display = items.length === 0 ? 'none' : 'block'
+  }
+
   // 各アイテムを描画
   items.forEach(item => {
     const li = document.createElement('li')
     li.className = 'item'
+    if (selectedItems.has(item.id)) {
+      li.classList.add('item-selected')
+    }
+
+    // チェックボックス
+    const checkbox = document.createElement('input')
+    checkbox.type = 'checkbox'
+    checkbox.className = 'item-checkbox'
+    checkbox.checked = selectedItems.has(item.id)
+    checkbox.addEventListener('change', () => {
+      if (checkbox.checked) {
+        selectedItems.add(item.id)
+        li.classList.add('item-selected')
+      } else {
+        selectedItems.delete(item.id)
+        li.classList.remove('item-selected')
+      }
+    })
 
     const titleSpan = document.createElement('span')
     titleSpan.className = 'item-title'
@@ -182,6 +258,7 @@ function renderItems(items) {
       input.focus()
     })
 
+    li.appendChild(checkbox)
     li.appendChild(titleSpan)
     li.appendChild(editButton)
     itemList.appendChild(li)
@@ -210,6 +287,11 @@ titleInput.addEventListener('keypress', (e) => {
     addItem()
   }
 })
+
+// 削除ボタンクリック
+if (deleteButton) {
+  deleteButton.addEventListener('click', deleteSelectedItems)
+}
 
 // =====================================================
 // 初期化

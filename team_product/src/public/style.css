@@ -107,9 +107,29 @@ header .subtitle {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* チェックボックス */
+.item-checkbox {
+  width: 18px;
+  height: 18px;
+  margin-right: 12px;
+  cursor: pointer;
+  accent-color: #3498db;
+}
+
 .item-title {
+  flex: 1;
   font-size: 1rem;
   color: #2c3e50;
+}
+
+/* 選択状態 */
+.item-selected {
+  background-color: #e8f4f8 !important;
+  border-left: 4px solid #3498db;
+}
+
+.item-selected .item-title {
+  font-weight: 500;
 }
 
   /* 編集ボタン */
@@ -153,6 +173,31 @@ header .subtitle {
   .done-button:hover {
     background-color: #27ae60;
   }
+
+  /* 削除ボタン */
+  .delete-button {
+    padding: 12px 24px;
+    font-size: 1rem;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .delete-button:hover {
+    background-color: #c0392b;
+  }
+
+/* 削除ボタンのコンテナ */
+.delete-section {
+  margin-bottom: 15px;
+  text-align: right;
+}
+
+/* 空メッセージ */
+.empty-message {
   color: #95a5a6;
   padding: 40px 20px;
   background-color: white;
