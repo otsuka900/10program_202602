@@ -97,6 +97,38 @@ async function addItem() {
 // ここに新しい機能（Delete, Updateなど）を追加していこう！
 // =====================================================
 
+/**
+ * アイテムを更新
+ *
+ * IPO:
+ * - Input: アイテムIDと新しいタイトル
+ * - Process: サーバーにPUTリクエストを送信
+ * - Output: 一覧を再読み込みして画面を更新
+ */
+async function updateItem(id, newTitle) {
+  console.log('[CLIENT] アイテムを更新:', id, newTitle)
+
+  try {
+    const response = await fetch(`/api/items/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: newTitle })
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error)
+    }
+
+    await loadItems()
+    console.log('[CLIENT] 更新完了')
+  } catch (error) {
+    console.error('[CLIENT] エラー:', error)
+    alert('更新に失敗しました: ' + error.message)
+  }
+}
+
+
 // =====================================================
 // 画面描画関数
 // =====================================================
@@ -115,9 +147,43 @@ function renderItems(items) {
   items.forEach(item => {
     const li = document.createElement('li')
     li.className = 'item'
-    li.innerHTML = `
-      <span class="item-title">${escapeHtml(item.title)}</span>
-    `
+
+    const titleSpan = document.createElement('span')
+    titleSpan.className = 'item-title'
+    titleSpan.textContent = item.title
+
+    const editButton = document.createElement('button')
+    editButton.textContent = '編集'
+    editButton.className = 'edit-button'
+    editButton.addEventListener('click', () => {
+      // 編集モードに切り替え
+      li.innerHTML = ''
+      const input = document.createElement('input')
+      input.type = 'text'
+      input.value = item.title
+      input.className = 'edit-input'
+
+      const doneButton = document.createElement('button')
+      doneButton.textContent = '完了'
+      doneButton.className = 'done-button'
+
+      // 完了ボタン押下時の処理
+      doneButton.addEventListener('click', async () => {
+        const trimmed = input.value.trim()
+        if (!trimmed) {
+          alert('タイトルを空にすることはできません')
+          return
+        }
+        await updateItem(item.id, trimmed)
+      })
+
+      li.appendChild(input)
+      li.appendChild(doneButton)
+      input.focus()
+    })
+
+    li.appendChild(titleSpan)
+    li.appendChild(editButton)
     itemList.appendChild(li)
   })
 }
