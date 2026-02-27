@@ -118,6 +118,35 @@ app.put('/api/items/:id', async (req, res) => {
   }
 })
 
+/**
+ * DELETE /api/items/:id - アイテム削除
+ *
+ * IPO:
+ * - Input: パスパラメーターにID
+ * - Process: DBから該当レコードを削除
+ * - Output: 削除したアイテムをJSONで返す
+ */
+app.delete('/api/items/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10)
+
+    // 削除処理
+    const item = await prisma.item.delete({
+      where: { id }
+    })
+
+    console.log('[SERVER] アイテムを削除:', item)
+    res.json(item)
+  } catch (error) {
+    console.error('[SERVER] エラー:', error)
+    // 削除対象が見つからない場合はPrismaからエラーが投げられる
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'アイテムが見つかりません' })
+    }
+    res.status(500).json({ error: 'アイテム削除に失敗しました' })
+  }
+})
+
 
 // =====================================================
 // サーバー起動
