@@ -35,12 +35,23 @@ app.use(express.static(path.join(__dirname, 'public')))
  */
 app.get('/api/items', async (req, res) => {
   try {
-    // DBからアイテムを取得（新しい順）
+    const { search } = req.query
+
+    // DBからアイテムを取得。検索文字列があれば絞り込み
+    const where = {}
+    if (search && typeof search === 'string' && search.trim() !== '') {
+      // 完全一致で検索
+      where.title = {
+        equals: search.trim()
+      }
+    }
+
     const items = await prisma.item.findMany({
+      where,
       orderBy: { createdAt: 'desc' }
     })
 
-    console.log('[SERVER] アイテム一覧を取得:', items.length, '件')
+    console.log('[SERVER] アイテム一覧を取得:', items.length, '件', search ? `(search=${search})` : '')
     res.json(items)
   } catch (error) {
     console.error('[SERVER] エラー:', error)

@@ -37,12 +37,21 @@ console.log('[CLIENT] ページが読み込まれました')
  * - Process: サーバーからアイテム一覧を取得
  * - Output: 画面にアイテムを表示
  */
-async function loadItems() {
-  console.log('[CLIENT] アイテム一覧を取得中...')
+/**
+ * アイテム一覧を取得して表示
+ *
+ * @param {string} [search] - 検索文字列（省略時は全件取得）
+ */
+async function loadItems(search) {
+  console.log('[CLIENT] アイテム一覧を取得中...', search ? `(検索: ${search})` : '')
 
   try {
     // サーバーにリクエスト（この時点でServer層に処理が移る）
-    const response = await fetch('/api/items')
+    let url = '/api/items'
+    if (search && search.trim() !== '') {
+      url += '?search=' + encodeURIComponent(search.trim())
+    }
+    const response = await fetch(url)
     const items = await response.json()
 
     console.log('[CLIENT] 取得完了:', items.length, '件')
@@ -286,6 +295,27 @@ titleInput.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') {
     addItem()
   }
+})
+
+// 検索ボタン
+const searchInput = document.getElementById('searchInput')
+const searchButton = document.getElementById('searchButton')
+const clearSearchButton = document.getElementById('clearSearchButton')
+
+searchButton.addEventListener('click', () => {
+  const q = searchInput.value
+  loadItems(q)
+})
+
+searchInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    loadItems(searchInput.value)
+  }
+})
+
+clearSearchButton.addEventListener('click', () => {
+  searchInput.value = ''
+  loadItems()
 })
 
 // 削除ボタンクリック
