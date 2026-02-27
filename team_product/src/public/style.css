@@ -112,9 +112,47 @@ header .subtitle {
   color: #2c3e50;
 }
 
-/* 空メッセージ */
-.empty-message {
-  text-align: center;
+  /* 編集ボタン */
+  .edit-button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    background-color: #f39c12;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .edit-button:hover {
+    background-color: #d35400;
+  }
+
+  /* 編集入力欄 */
+  .edit-input {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-right: 8px;
+  }
+
+  /* 完了ボタン */
+  .done-button {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    background-color: #2ecc71;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .done-button:hover {
+    background-color: #27ae60;
+  }
   color: #95a5a6;
   padding: 40px 20px;
   background-color: white;
