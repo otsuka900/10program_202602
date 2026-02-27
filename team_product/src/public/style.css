@@ -43,10 +43,40 @@ header .subtitle {
 }
 
 /* フォーム */
-.add-form {
+.add-form,
+.search-form {
   display: flex;
   gap: 10px;
   margin-bottom: 30px;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 12px 15px;
+  font-size: 1rem;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-form input:focus {
+  border-color: #3498db;
+}
+
+.search-form button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-form button:hover {
+  background-color: #2980b9;
 }
 
 .add-form input {
